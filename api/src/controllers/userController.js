@@ -4,6 +4,7 @@ let users = [];
 module.exports = class userController {
   static async createUser(req, res) {
     const { cpf, email, password, name } = req.body;
+    
     if (!cpf || !email || !password || !name) {
       return res.status(400).json({ error: "Todos os campos devem ser preenchidos" });
     } else if (isNaN(cpf) || cpf.length !== 11) {
@@ -21,6 +22,7 @@ module.exports = class userController {
     // Cria e adiciona novo usuário
     const newUser = { cpf, email, password, name };
     users.push(newUser);
+
     return res.status(201).json({ message: "Usuário criado com sucesso", user: newUser });
   }
 
@@ -31,6 +33,7 @@ module.exports = class userController {
   static async updateUser(req, res) {
     // desestrutura e recupera os dados enviados via corpo da requisição 
     const {cpf, email, password, name} = req.body;
+
     // validação se todos os campos foram preenchidos 
     if (!cpf || !email|| !password || !name){
         return res.status(400).json({error: "Todos os campos devem ser preenchidos"});
@@ -42,16 +45,25 @@ module.exports = class userController {
     if (userIndex === -1) {
         return res.status(400).json({error: "Usuário não encontrado"});
     }
+
+    // Atualiza os dados do usuário no Array 'users'
+    users[userIndex] = {cpf, email, password, name}
+
+    return res.satus(200).json({message: "Usuário atualizado", user:users[userIndex]})
+}
+
+  static async deleteUser(req, res){
+    const userId = req.params.cpf
+
+    const userIndex = users.findIndex(user => user.cpf === userId)
+
+    if(userIndex === -1){
+      return res.status(400).json({error: "Usuário não encontrado"});
+    }
     // Removendo o usuário do Array "Users"
     users.splice(userIndex, 1);
+    
     return req.status(200).json({message: "Usuário Apagado"})
-    // Atualiza os dados do usuário no Array "users"
-    users[userIndex] = {cpf, email, password, name}
-    return res.status(200).json({message: "Usuário atualizado", user:users[userIndex]})
-  }
-  static async deleteUser(req, res) {
-   // Obtém o parametro "id" da requisição, que é o CPF do user a ser a sua 
-   const userId = req.params.cpf
-  }
+  };
 }
 // ======================================================================================== 
